@@ -75,7 +75,12 @@
         <div id="text8"></div>
         <div id="text9"></div>
         <div id="text10"></div>
+
     </p>
+    
+
+    
+
 
 <py-script>
     def clicked():
@@ -164,10 +169,13 @@
         ]
 
         ss,total=main(rate,sample_data)
+
         for i in range(9):
-            Element(f"text{i+1}").write("さささ")
+            Element(f"text{i+1}").write("----------")
+
         for n in range(len(ss)):
             Element(f"text{n+1}").write(ss[n])
+
         Element("text").write(total)
 
 </py-script>
