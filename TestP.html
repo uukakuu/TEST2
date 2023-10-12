@@ -1,0 +1,177 @@
+<html lang="ja">
+<head>
+    <style>
+       
+
+    </style>
+<meta charset="UTF-8">
+<link rel="stylesheet" href="https://pyscript.net/latest/pyscript.css" />
+<script defer src="https://pyscript.net/latest/pyscript.js"></script>
+</head>
+<body>
+    <p>
+        <label>レート　点　：</label>
+        <Input type="Input" id="rate1" value=2>
+    </p>
+    <p>
+        <label>かく</label>
+        <Input type="Input" id="kaku" value=0>
+    </p>
+    <p>
+        <label>じゅん</label>
+        <Input type="Input" id="jun" value=0>
+    </p>
+    <p>
+        <label>ゆだ</label>
+        <Input type="Input" id="yuda" value=0>
+    </p>
+    <p>
+        <label>だいそん</label>
+        <Input type="Input" id="daison" value=0>
+    </p>
+    <p>
+        <label>ひょうどう</label>
+        <Input type="Input" id="hyodo" value=0>
+    </p>
+    <p>
+        <label>かねおか</label>
+        <Input type="Input" id="kaneoka" value=0>
+    </p>
+    <p>
+        <label>きむ</label>
+        <Input type="Input" id="kimu" value=0>
+    </p>
+    <p>
+        <label>いぐち</label>
+        <Input type="Input" id="iguchi" value=0>
+    </p>
+    <p>
+        <label>Guest1</label>
+        <Input type="Input" id="G1" value=0>
+    </p>
+    <p>
+        <label>Guest2</label>
+        <Input type="Input" id="G2" value=0>
+    </p>
+    <p>
+        <label>Guest3</label>
+        <Input type="Input" id="G3" value=0>
+    </p>
+
+    <button py-click="clicked()" id="button">計算</button>
+
+    <p>
+        <label>過不足ポイント : </label><div id="text"></div>
+    </p>
+    
+    <p>
+        <div id="text1"></div>
+        <div id="text2"></div>
+        <div id="text3"></div>
+        <div id="text4"></div>
+        <div id="text5"></div>
+        <div id="text6"></div>
+        <div id="text7"></div>
+
+    </p>
+    
+
+    
+
+
+<py-script>
+    def clicked():
+        def calculation(payment, liquidation=[]):
+            # 支払金額が多い順に並べる（受け取る金額多い人が先頭）
+            payment = sorted(payment, key=lambda p: p['price_to_get'], reverse=True)
+
+            # 現在の最大債務者と最大債権者を取得
+            creditor = payment[0]
+            debtor = payment[-1]
+
+            # 清算金額を算出
+            amount = min(creditor['price_to_get'], abs(debtor['price_to_get']))
+
+            # 清算金額が0円の場合は終了
+            if amount == 0:
+                return (payment, liquidation)
+
+            # 債権者と債務者で清算を行い、再帰呼び出しを行う
+            creditor['price_to_get'] -= amount
+            debtor['price_to_get'] += amount
+            liquidation.append({
+                'debtor': debtor['member_name'],
+                'creditor': creditor['member_name'],
+                'amount': amount
+            })
+
+            return calculation(payment, liquidation)
+
+        def main(rate,sample_data):
+            ss=[]
+
+            price_list=[]
+            # total_balanceを取得（サンプルデータ）
+            total_balance = sample_data
+
+                   
+            # 清算時の送金額を表示
+            (payment, liquidation) = calculation(total_balance)
+
+            #print('-----------------')
+            #print('清算時の送金額')
+            for l in liquidation:
+                #print(f"{l['debtor']} -> {l['creditor']}: {rate*int(l['amount'])}")
+                ss.append(str(f"{l['debtor']} -> {l['creditor']}: {rate*int(l['amount'])}"))
+           
+
+            # 相殺金額
+            #print('-----------------')
+            total = 0
+            for p in total_balance:
+                total += p['price_to_get']
+            #print(f'過不足ポイント: {int(total)}')
+
+            return ss,total
+
+        # レート
+        rate=int(Element("rate1").element.value)
+
+        
+        price1=int(Element("kaku").element.value)
+        price2=int(Element("yuda").element.value)
+        price3=int(Element("jun").element.value)
+        price4=int(Element("kaneoka").element.value)
+        price5=int(Element("daison").element.value)
+        price6=int(Element("hyodo").element.value)
+        price7=int(Element("iguchi").element.value)
+        price8=int(Element("kimu").element.value)
+        price9=int(Element("G1").element.value)
+        price10=int(Element("G2").element.value)
+        price11=int(Element("G3").element.value)
+        
+
+        sample_data = [
+            {'member_name': 'かく', 'price_to_get': price1},
+            {'member_name': 'ゆだ', 'price_to_get': price2},
+            {'member_name': 'じゅん', 'price_to_get': price3},
+            {'member_name': 'かねおか', 'price_to_get': price4},
+            {'member_name': 'だいそん', 'price_to_get': price5},
+            {'member_name': 'ひょうどう', 'price_to_get': price6},
+            {'member_name': 'いぐち', 'price_to_get': price7},
+            {'member_name': 'きむ', 'price_to_get': price8},
+            {'member_name': 'Guest1', 'price_to_get': price9},
+            {'member_name': 'Guest2', 'price_to_get': price10},
+            {'member_name': 'Guest3', 'price_to_get': price11}
+        ]
+
+        ss,total=main(rate,sample_data)
+
+        for n in range(len(ss)):
+            Element(f"text{n+1}").write(ss[n])
+
+        Element("text").write(total)
+
+</py-script>
+</body>
+</html>
